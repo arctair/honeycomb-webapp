@@ -10,7 +10,7 @@ function Scene() {
   return (
     <Canvas camera={{ position: [-10, 10, 0] }}>
       <CameraControls />
-      <Terrain />
+      <BaseGrid />
       <pointLight position={[4, 4, 5]} />
       <ambientLight />
     </Canvas>
@@ -29,19 +29,26 @@ function CameraControls() {
   )
 }
 
-function Terrain() {
+function BaseGrid() {
   const cells = useCells({ size: 32 })
   return (
     <>
       {cells.map(([x, z]) => (
-        <mesh position={[x, 0, z]} key={`${x}-${z}`}>
-          <meshStandardMaterial
-            color={(x + z) % 2 === 0 ? '#080' : '#2A2'}
-          />
-          <boxGeometry args={[1, 1, 1]} />
-        </mesh>
+        <BaseGridCell position={[x, z]} key={`${x}-${z}`} />
       ))}
     </>
+  )
+}
+
+interface BaseGridCellProps {
+  position: [x: number, z: number]
+}
+function BaseGridCell({ position: [x, z] }: BaseGridCellProps) {
+  return (
+    <mesh position={[x, 0, z]}>
+      <meshStandardMaterial color={(x + z) % 2 === 0 ? '#080' : '#2A2'} />
+      <boxGeometry args={[1, 1, 1]} />
+    </mesh>
   )
 }
 
