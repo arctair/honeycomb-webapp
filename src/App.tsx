@@ -9,7 +9,7 @@ export default function App() {
 function Scene() {
   return (
     <Canvas camera={{ position: [-10, 10, 0] }}>
-      <Camera />
+      <CameraControls />
       <Terrain />
       <pointLight position={[4, 4, 5]} />
       <ambientLight />
@@ -17,7 +17,7 @@ function Scene() {
   )
 }
 
-function Camera() {
+function CameraControls() {
   return (
     <OrbitControls
       minDistance={10}
