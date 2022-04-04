@@ -15,6 +15,7 @@ function Scene() {
       <BaseGrid />
       <pointLight position={[4, 4, 5]} />
       <ambientLight />
+      <color attach="background" args={['#777777']} />
     </Canvas>
   )
 }
