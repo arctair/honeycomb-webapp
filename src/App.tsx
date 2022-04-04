@@ -1,6 +1,8 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useState } from 'react'
+import useAxialGrid from './useAxialGrid'
+import SimplexNoise from 'simplex-noise'
+import { qr, xz } from './types'
 
 export default function App() {
   return <Scene />
@@ -30,42 +32,33 @@ function CameraControls() {
 }
 
 function BaseGrid() {
-  const cells = useCells({ size: 32 })
+  const cells = useAxialGrid(32)
   return (
     <>
-      {cells.map(([x, z]) => (
-        <BaseGridCell position={[x, z]} key={`${x}-${z}`} />
+      {cells.map((cell) => (
+        <BaseGridCell position={toXZ(cell)} key={`${cell.q}-${cell.r}`} />
       ))}
     </>
   )
 }
 
+const simplex = new SimplexNoise()
+
 interface BaseGridCellProps {
-  position: [x: number, z: number]
+  position: xz
 }
 function BaseGridCell({ position: [x, z] }: BaseGridCellProps) {
+  const value = simplex.noise2D(x / 10, z / 10)
   return (
-    <mesh position={[x, 0, z]}>
-      <meshStandardMaterial color={(x + z) % 2 === 0 ? '#080' : '#2A2'} />
-      <boxGeometry args={[1, 1, 1]} />
+    <mesh position={[x, value / 5, z]}>
+      <meshStandardMaterial
+        color={`hsl(123, 45%, ${40 + Math.floor(value)}%)`}
+      />
+      <cylinderGeometry args={[1, 1, 1, 6]} />
     </mesh>
   )
 }
 
-type xz = [x: number, z: number]
-interface useCellsProps {
-  size: number
-}
-function useCells({ size }: useCellsProps = { size: 16 }) {
-  const [cells, setCells] = useState<xz[]>([])
-  useEffect(() => {
-    const cells = [] as xz[]
-    for (let x = -size / 2; x <= size / 2; x++) {
-      for (let z = -size / 2; z <= size / 2; z++) {
-        cells.push([x, z])
-      }
-    }
-    setCells(cells)
-  }, [size])
-  return cells
+function toXZ({ q, r }: qr): xz {
+  return [Math.sqrt(3) * q + (r * Math.sqrt(3)) / 2, (3 / 2) * -r]
 }
