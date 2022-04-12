@@ -1,34 +1,30 @@
-import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
+import EventEmitter from 'events'
+import CameraControls from './CameraControls'
 import { Tile } from './types'
 import useChunk from './useChunk'
+import ZoomControls from './ZoomControls'
 
 export default function App() {
-  return <Scene />
+  const events = new EventEmitter()
+  return (
+    <>
+      <ZoomControls onZoom={(delta) => events.emit('zoom', delta)} />
+      <Scene events={events} />
+    </>
+  )
 }
 
-function Scene() {
+type SceneProps = { events: EventEmitter }
+function Scene({ events }: SceneProps) {
   return (
     <Canvas>
-      <CameraControls />
+      <CameraControls events={events} />
       <Chunk />
       <pointLight position={[4, 4, 5]} />
       <ambientLight />
       <color attach="background" args={['#777777']} />
     </Canvas>
-  )
-}
-
-function CameraControls() {
-  return (
-    <OrbitControls
-      minDistance={40}
-      maxDistance={80}
-      dampingFactor={0.2}
-      minPolarAngle={Math.PI / 8}
-      maxPolarAngle={(3 * Math.PI) / 8}
-      target={[16, 0, 16]}
-    />
   )
 }
 
