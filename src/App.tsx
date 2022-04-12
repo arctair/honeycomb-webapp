@@ -1,8 +1,7 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import useAxialGrid from './useAxialGrid'
-import SimplexNoise from 'simplex-noise'
-import { qr, xz } from './types'
+import { Tile } from './types'
+import useChunk from './useChunk'
 
 export default function App() {
   return <Scene />
@@ -12,7 +11,7 @@ function Scene() {
   return (
     <Canvas camera={{ position: [-10, 10, 0] }}>
       <CameraControls />
-      <BaseGrid />
+      <Chunk />
       <pointLight position={[4, 4, 5]} />
       <ambientLight />
       <color attach="background" args={['#777777']} />
@@ -32,34 +31,27 @@ function CameraControls() {
   )
 }
 
-function BaseGrid() {
-  const cells = useAxialGrid(32)
+function Chunk() {
+  const tiles = useChunk(32)
   return (
     <>
-      {cells.map((cell) => (
-        <BaseGridCell position={toXZ(cell)} key={`${cell.q}-${cell.r}`} />
+      {tiles.map((tile) => (
+        <TileComponent tile={tile} key={tile.id} />
       ))}
     </>
   )
 }
 
-const simplex = new SimplexNoise()
-
-interface BaseGridCellProps {
-  position: xz
+interface TileComponentProps {
+  tile: Tile
 }
-function BaseGridCell({ position: [x, z] }: BaseGridCellProps) {
-  const value = simplex.noise2D(x / 10, z / 10)
+function TileComponent({ tile: { x, z } }: TileComponentProps) {
+  const color =
+    (x + z) % 2 === 0 ? 'hsl(123, 45%, 45%)' : 'hsl(123, 45%, 40%)'
   return (
-    <mesh position={[x, value / 5, z]}>
-      <meshStandardMaterial
-        color={`hsl(123, 45%, ${40 + Math.floor(value)}%)`}
-      />
-      <cylinderGeometry args={[1, 1, 1, 6]} />
+    <mesh position={[x, 0, z]}>
+      <meshStandardMaterial color={color} />
+      <boxGeometry args={[1, 1, 1]} />
     </mesh>
   )
-}
-
-function toXZ({ q, r }: qr): xz {
-  return [Math.sqrt(3) * q + (r * Math.sqrt(3)) / 2, (3 / 2) * -r]
 }
