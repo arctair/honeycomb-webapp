@@ -9,7 +9,7 @@ export default function App() {
 
 function Scene() {
   return (
-    <Canvas camera={{ position: [-10, 10, 0] }}>
+    <Canvas>
       <CameraControls />
       <Chunk />
       <pointLight position={[4, 4, 5]} />
@@ -22,11 +22,12 @@ function Scene() {
 function CameraControls() {
   return (
     <OrbitControls
-      minDistance={10}
-      maxDistance={20}
+      minDistance={40}
+      maxDistance={80}
       dampingFactor={0.2}
       minPolarAngle={Math.PI / 8}
       maxPolarAngle={(3 * Math.PI) / 8}
+      target={[16, 0, 16]}
     />
   )
 }
@@ -49,7 +50,7 @@ function TileComponent({ tile: { x, z } }: TileComponentProps) {
   const color =
     (x + z) % 2 === 0 ? 'hsl(123, 45%, 45%)' : 'hsl(123, 45%, 40%)'
   return (
-    <mesh position={[x, 0, z]}>
+    <mesh position={[x + 0.5, 0, z + 0.5]}>
       <meshStandardMaterial color={color} />
       <boxGeometry args={[1, 1, 1]} />
     </mesh>
